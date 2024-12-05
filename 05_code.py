@@ -34,7 +34,7 @@ with open(input_file, "r") as f:
 
 invalid_updates = []
 middle_number_of_valid_updates = []
-for i, update in enumerate(updates):
+for update in updates:
 
     if update_is_valid(update, rules):
         assert len(update) % 2 == 1
@@ -48,7 +48,7 @@ print(f"First part: {sum(middle_number_of_valid_updates)}")
 
 
 corrected_updates = []
-for i, invalid_update in enumerate(invalid_updates):
+for invalid_update in invalid_updates:
     update = []
     while len(invalid_update):
         test_number = invalid_update.pop()
