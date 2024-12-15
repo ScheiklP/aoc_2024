@@ -119,27 +119,3 @@ for i, line in enumerate(matrix):
             cost += 100 * i + j
 
 print(f"First part: {cost}")
-
-
-expanded_matrix = []
-for i, line in enumerate(matrix):
-    expanded_line = []
-    for j, c in enumerate(line):
-        if c == "#":
-            expanded_line.extend(["#", "#"])
-        elif c == ".":
-            expanded_line.extend([".", "."])
-        elif c == "O":
-            expanded_line.extend(["[", "]"])
-        elif c == "@":
-            expanded_line.extend(["@", "."])
-    expanded_matrix.append(expanded_line)
-matrix = expanded_matrix
-
-robot_pos = None
-for i, line in enumerate(matrix):
-    for j, c in enumerate(line):
-        if c == "@":
-            robot_pos = (i, j)
-            break
-r, c = robot_pos
