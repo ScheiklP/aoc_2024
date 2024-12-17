@@ -18,6 +18,7 @@ test_maze = """
 ###############
 """
 test_score = 7036
+test_fields = 45
 
 test_maze2 = """
 #################
@@ -39,6 +40,7 @@ test_maze2 = """
 #################
 """
 test_score2 = 11048
+test_fields2 = 64
 
 move_cost = 1
 turn_cost = 1000
@@ -62,6 +64,7 @@ grids.append(grid)
 
 
 costs = []
+num_fields = []
 for i, grid in enumerate(grids):
     for r, line in enumerate(grid):
         for c, char in enumerate(line):
@@ -76,7 +79,7 @@ for i, grid in enumerate(grids):
 
     rows = len(grid)
     cols = len(grid[0])
-    # parents = [[[[] for _ in range(len(dirs))] for _ in range(cols)] for _ in range(rows)]
+    parents = [[[[] for _ in range(len(dirs))] for _ in range(cols)] for _ in range(rows)]
 
     directed_cost_grid = [[[float("inf") for _ in range(len(dirs))] for _ in range(cols)] for _ in range(rows)]
     directed_cost_grid[start_r][start_c][start_dir] = 0
@@ -85,10 +88,6 @@ for i, grid in enumerate(grids):
 
     while priority_queue:
         current_cost, (r, c, d) = heapq.heappop(priority_queue)
-
-        # disabled for part 2
-        # if (r, c) == (end_r, end_c):
-        #     break
 
         if current_cost > directed_cost_grid[r][c][d]:
             continue
@@ -104,15 +103,27 @@ for i, grid in enumerate(grids):
                 if current_cost + cost < directed_cost_grid[r2][c2][d2]:
                     directed_cost_grid[r2][c2][d2] = current_cost + cost
                     heapq.heappush(priority_queue, (current_cost + cost, (r2, c2, d2)))
-                    # parents[r2][c2][d2] == [(r, c, d)]
+                    parents[r2][c2][d2] = [(r, c, d)]
 
-                # elif current_cost + cost == directed_cost_grid[r2][c2][d2]:
-                # parents[r2][c2][d2].append((r, c, d))
+                elif current_cost + cost == directed_cost_grid[r2][c2][d2]:
+                    parents[r2][c2][d2].append((r, c, d))
 
     optimal_paths = []
 
+    def backtrack(r, c, d, path):
+        if (r, c) == start:
+            path.append((r, c))
+            optimal_paths.append(path)
+            return
+        for r2, c2, d2 in parents[r][c][d]:
+            backtrack(r2, c2, d2, path + [(r, c)])
+
+    backtrack(end_r, end_c, 0, [])
+    fields = set()
+
     for optimal_path in optimal_paths:
         for r, c in optimal_path:
+            fields.add((r, c))
             grid[r][c] = "O"
         grid[start_r][start_c] = "S"
         grid[end_r][end_c] = "E"
@@ -121,6 +132,7 @@ for i, grid in enumerate(grids):
         to_print = "\n".join("".join(line) for line in grid)
         print(to_print)
 
+    num_fields.append(len(fields))
     costs.append(
         min(
             (
@@ -132,6 +144,10 @@ for i, grid in enumerate(grids):
         )
     )
 
+
 assert costs[0] == test_score
 assert costs[1] == test_score2
+assert num_fields[0] == test_fields
+assert num_fields[1] == test_fields2
 print(f"First part: {costs[2]}")
+print(f"Second part: {num_fields[2]}")
