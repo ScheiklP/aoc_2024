@@ -1,3 +1,5 @@
+from functools import cache
+
 test_input = """
 r, wr, b, g, bwu, rb, gb, br
 
@@ -27,32 +29,23 @@ for i, line in enumerate(data):
             patterns.append(line)
 
 
-num_possible_patterns = 0
+@cache
+def exact_recursive(sub_pattern):
+    solutions = 0
+    for i in range(len(sub_pattern)):
+        if sub_pattern[:i] in towels:
+            if sub_pattern[i:] in towels:
+                solutions += 1
+            solutions += exact_recursive(sub_pattern[i:])
+    return solutions
+
+
+possible_patterns = 0
+total_sum = 0
 for pat_num, pattern in enumerate(patterns):
+    new_possible_patterns = exact_recursive(pattern)
+    total_sum += new_possible_patterns
+    possible_patterns += 1 if new_possible_patterns > 0 else 0
 
-    to_match = set()
-    to_match.add(pattern)
-    done = False
-    num_solutions = 0
-
-    while len(to_match):
-        for check in to_match:
-            if check in towels:
-                num_possible_patterns += 1
-                done = True
-                break
-
-        if not done:
-            check = to_match.pop()
-            if check in towels:
-                num_possible_patterns += 1
-                done = True
-            for i in range(len(check)):
-                sub_pattern = check[:i]
-                if sub_pattern in towels:
-                    remainder = check[i:]
-                    to_match.add(remainder)
-        else:
-            break
-
-print(f"First part: {num_possible_patterns}")
+print(f"First part: {possible_patterns}")
+print(f"Second part: {total_sum}")
